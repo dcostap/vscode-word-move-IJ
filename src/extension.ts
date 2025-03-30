@@ -30,124 +30,125 @@ export function activate(context: vscode.ExtensionContext) {
             return false;
         }
 
-        const char = document.getText(new vscode.Range(position, position.translate(0, 0)));
-        vscode.window.showInformationMessage('Whitespace detected: ' + char);
+        const char = document.getText(new vscode.Range(position, position.translate(0, 1)));
         return /\s/.test(char);
     }
 
-    // Scan through whitespace to the left and return the new position
-    function scanLeftThroughWhitespace(document: vscode.TextDocument, position: vscode.Position): vscode.Position {
-        let currentPosition = position;
-        let prevPosition: vscode.Position;
-
-        while (true) {
-            if (currentPosition.character === 0) {
-                // At beginning of line, can't go further left on this line
-                if (currentPosition.line <= 0) {
-                    return currentPosition; // At document start
-                }
-                // Move to end of previous line
-                const prevLine = document.lineAt(currentPosition.line - 1);
-                prevPosition = new vscode.Position(currentPosition.line - 1, prevLine.text.length);
-            } else {
-                prevPosition = currentPosition.translate(0, -1);
-            }
-
-            if (!isWhitespace(document, prevPosition)) {
-                return currentPosition;
-            }
-            currentPosition = prevPosition;
-        }
-    }
-
-    // Scan through whitespace to the right and return the new position
-    function scanRightThroughWhitespace(document: vscode.TextDocument, position: vscode.Position): vscode.Position {
-        let currentPosition = position;
-        let nextPosition: vscode.Position;
-
-        while (true) {
-            const currentLine = document.lineAt(currentPosition.line);
-            if (currentPosition.character >= currentLine.text.length) {
+    // Get the position to the left or right of the current position
+    function getAdjacentPosition(document: vscode.TextDocument, position: vscode.Position, moveRight: boolean): vscode.Position | null {
+        if (moveRight) {
+            const currentLine = document.lineAt(position.line);
+            if (position.character >= currentLine.text.length) {
                 // At end of line, can't go further right on this line
-                if (currentPosition.line >= document.lineCount - 1) {
-                    return currentPosition; // At document end
+                if (position.line >= document.lineCount - 1) {
+                    return null; // At document end
                 }
                 // Move to start of next line
-                nextPosition = new vscode.Position(currentPosition.line + 1, 0);
+                return new vscode.Position(position.line + 1, 0);
             } else {
-                nextPosition = currentPosition.translate(0, 1);
+                return position.translate(0, 1);
             }
-
-            if (!isWhitespace(document, nextPosition)) {
-                return nextPosition;
+        } else {
+            if (position.character <= 0) {
+                // At start of line, can't go further left on this line
+                if (position.line <= 0) {
+                    return null; // At document start
+                }
+                // Move to end of previous line
+                const prevLine = document.lineAt(position.line - 1);
+                return new vscode.Position(position.line - 1, prevLine.text.length);
+            } else {
+                return position.translate(0, -1);
             }
-            currentPosition = nextPosition;
         }
     }
 
-    // Move cursor word start left command (Ctrl+Left)
-    context.subscriptions.push(vscode.commands.registerCommand('wordmoveij.cursorWordStartLeft', () => {
+    // Scan through whitespace in specified direction and return the new position
+    function scanThroughWhitespace(document: vscode.TextDocument, position: vscode.Position, moveRight: boolean): vscode.Position {
+        let currentPosition = position;
+        let adjacentPosition: vscode.Position | null;
 
-    }));
+        while (true) {
+            adjacentPosition = getAdjacentPosition(document, currentPosition, moveRight);
+            if (!adjacentPosition) {
+                return currentPosition; // Can't move further
+            }
 
-    // Move cursor word end right command (Ctrl+Right)
-    context.subscriptions.push(vscode.commands.registerCommand('wordmoveij.cursorWordEndRight', () => {
+            if (!isWhitespace(document, adjacentPosition)) {
+                return moveRight ? adjacentPosition : currentPosition;
+            }
+            currentPosition = adjacentPosition;
+        }
+    }
+
+    // Handle cursor movement in either direction, with or without selection
+    function handleCursorMovement(moveRight: boolean, select: boolean) {
         const editor = vscode.window.activeTextEditor;
         if (!editor) return;
 
         const document = editor.document;
         const position = editor.selection.active;
         
-        // If we're at the end of the document, do nothing
-        const lastLine = document.lineAt(document.lineCount - 1);
-        if (position.line === lastLine.lineNumber && position.character === lastLine.text.length) return;
-
-        // Check the character to the right
-        let nextPosition: vscode.Position;
-        const currentLine = document.lineAt(position.line);
-        if (position.character >= currentLine.text.length) {
-            // We're at the end of a line, move to the beginning of the next line
-            if (position.line >= document.lineCount - 1) return;
-            nextPosition = new vscode.Position(position.line + 1, 0);
+        // Check if we're at document boundary
+        if (moveRight) {
+            const lastLine = document.lineAt(document.lineCount - 1);
+            if (position.line === lastLine.lineNumber && position.character === lastLine.text.length) return;
         } else {
-            nextPosition = position.translate(0, 1);
+            if (position.line === 0 && position.character === 0) return;
         }
 
-        // Handle whitespace specially
-        if (isWhitespace(document, nextPosition)) {
-            vscode.window.showInformationMessage('Whitespace detected, moving cursor right');
-            const newPosition = scanRightThroughWhitespace(document, position);
+        // Position to check (current for right, previous for left)
+        const checkPosition = moveRight ? position : getAdjacentPosition(document, position, false);
+        if (!checkPosition) return;
+
+        // Handle whitespace
+        if (isWhitespace(document, checkPosition)) {
+            const newPosition = scanThroughWhitespace(document, position, moveRight);
             
-            // If we hit a newline, use default word movement
-            if (newPosition.line !== position.line) {
-                vscode.commands.executeCommand('cursorRight');
-                return;
+            // Move to the new position
+            if (select) {
+                const anchor = editor.selection.anchor;
+                editor.selection = new vscode.Selection(anchor, newPosition);
+            } else {
+                editor.selection = new vscode.Selection(newPosition, newPosition);
             }
-            
-            // Otherwise move to the new position
-            editor.selection = new vscode.Selection(newPosition, newPosition);
             return;
         }
 
-        // If the next character is a word separator, move cursor right by one
-        if (isWordSeparator(document, position)) {
-            // debug notify in popup
-            vscode.window.showInformationMessage('Word separator detected, moving cursor right');
-            vscode.commands.executeCommand('cursorRight');
+        // Handle word separators vs. regular words
+        if (isWordSeparator(document, checkPosition)) {
+            // Just move one character in the appropriate direction
+            const command = moveRight ? 
+                (select ? 'cursorRightSelect' : 'cursorRight') : 
+                (select ? 'cursorLeftSelect' : 'cursorLeft');
+            vscode.commands.executeCommand(command);
         } else {
-            vscode.window.showInformationMessage('detected: ' + document.getText(new vscode.Range(position, nextPosition)));
-            vscode.commands.executeCommand('cursorWordEndRight');
+            // Use VS Code's word navigation
+            const command = moveRight ? 
+                (select ? 'cursorWordEndRightSelect' : 'cursorWordEndRight') : 
+                (select ? 'cursorWordStartLeftSelect' : 'cursorWordStartLeft');
+            vscode.commands.executeCommand(command);
         }
+    }
+
+    // Move cursor word start left command (Ctrl+Left)
+    context.subscriptions.push(vscode.commands.registerCommand('wordmoveij.cursorWordStartLeft', () => {
+        handleCursorMovement(false, false);
+    }));
+
+    // Move cursor word end right command (Ctrl+Right)
+    context.subscriptions.push(vscode.commands.registerCommand('wordmoveij.cursorWordEndRight', () => {
+        handleCursorMovement(true, false);
     }));
 
     // Select word start left command (Ctrl+Shift+Left)
     context.subscriptions.push(vscode.commands.registerCommand('wordmoveij.cursorWordStartLeftSelect', () => {
-
+        handleCursorMovement(false, true);
     }));
 
     // Select word end right command (Ctrl+Shift+Right)
     context.subscriptions.push(vscode.commands.registerCommand('wordmoveij.cursorWordEndRightSelect', () => {
-
+        handleCursorMovement(true, true);
     }));
 }
 
