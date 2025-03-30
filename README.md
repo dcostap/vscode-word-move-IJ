@@ -13,12 +13,14 @@ WordMoveIJ changes how cursor movement works when using word navigation commands
 
 ## How to Use
 
-The extension provides four commands:
+The extension provides four commands, mapped to the default `ctrl + left`, `ctrl + shift + left`, etc keybindings:
 
 - `wordmoveij.cursorWordStartLeft` (replaces `cursorWordStartLeft`)
 - `wordmoveij.cursorWordEndRight` (replaces `cursorWordEndRight`)
 - `wordmoveij.cursorWordStartLeftSelect` (replaces `cursorWordStartLeftSelect`)
 - `wordmoveij.cursorWordEndRightSelect` (replaces `cursorWordEndRightSelect`)
+
+> ⚠️ **Warning:** You will need to remove the default bindings for `ctrl + left`, `ctrl + shift + left`, etc. so this extension can take control of those.
 
 ```json
 [
