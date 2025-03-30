@@ -13,50 +13,43 @@ WordMoveIJ changes how cursor movement works when using word navigation commands
 
 ## How to Use
 
-The extension provides four commands, mapped to the default `ctrl + left`, `ctrl + shift + left`, etc keybindings:
+The extension provides four commands, mapped to `ctrl + left`, `ctrl + shift + left`, etc (thus overriding the default ones in VS Code):
 
 - `wordmoveij.cursorWordStartLeft` (replaces `cursorWordStartLeft`)
 - `wordmoveij.cursorWordEndRight` (replaces `cursorWordEndRight`)
 - `wordmoveij.cursorWordStartLeftSelect` (replaces `cursorWordStartLeftSelect`)
 - `wordmoveij.cursorWordEndRightSelect` (replaces `cursorWordEndRightSelect`)
 
-> ⚠️ **Warning:** You will need to remove the default bindings for `ctrl + left`, `ctrl + shift + left`, etc. so this extension can take control of those.
+You can customize which characters are considered word separators by modifying the Vs Code built-in `editor.wordSeparators` setting in your preferences.
 
-```json
-[
-    {
-        "key": "ctrl+left",
-        "command": "wordmoveij.cursorWordStartLeft",
-        "when": "textInputFocus && !accessibilityModeEnabled"
-    },
-    {
-        "key": "ctrl+right",
-        "command": "wordmoveij.cursorWordEndRight",
-        "when": "textInputFocus && !accessibilityModeEnabled"
-    },
-    {
-        "key": "ctrl+shift+left",
-        "command": "wordmoveij.cursorWordStartLeftSelect",
-        "when": "textInputFocus && !accessibilityModeEnabled"
-    },
-    {
-        "key": "ctrl+shift+right",
-        "command": "wordmoveij.cursorWordEndRightSelect",
-        "when": "textInputFocus && !accessibilityModeEnabled"
-    }
-]
-```
+## Installation
 
-## Requirements
+I made this extension for myself, so I didn't bother publishing it.
 
-This extension uses VS Code's built-in word separator configuration. You can customize which characters are considered word separators by modifying the `editor.wordSeparators` setting in your preferences.
+### Installation from VSIX file
 
-## Known Issues
+1. Create the VSIX package:
+   ```bash
+   npm install
+   npm run vscode:prepublish
+   npx vsce package
+   ```
 
-Please report any issues on the GitHub repository.
+2. Install the extension:
+   - In VS Code: `Extensions → ⋯ → Install from VSIX...` and select the generated `.vsix` file
+   - Or from command line: `code --install-extension wordmoveij-0.0.1.vsix`
 
-## Release Notes
+### On a new PC
 
-### 0.0.1
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/wordmoveij.git
+   cd wordmoveij
+   ```
 
-Initial release of WordMoveIJ with support for basic JetBrains-style word navigation.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Follow the steps above to create and install the VSIX package
