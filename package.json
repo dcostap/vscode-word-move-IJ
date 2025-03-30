@@ -29,6 +29,28 @@
         "command": "wordmoveij.cursorWordEndRightSelect",
         "title": "WordMoveIJ: Select Word End Right"
       }
+    ],
+    "keybindings": [
+      {
+        "command": "wordmoveij.cursorWordStartLeft",
+        "key": "ctrl+left",
+        "when": "textInputFocus && !accessibilityModeEnabled"
+      },
+      {
+        "command": "wordmoveij.cursorWordEndRight",
+        "key": "ctrl+right",
+        "when": "textInputFocus && !accessibilityModeEnabled"
+      },
+      {
+        "command": "wordmoveij.cursorWordStartLeftSelect",
+        "key": "ctrl+shift+left",
+        "when": "textInputFocus && !accessibilityModeEnabled"
+      },
+      {
+        "command": "wordmoveij.cursorWordEndRightSelect",
+        "key": "ctrl+shift+right",
+        "when": "textInputFocus && !accessibilityModeEnabled"
+      }
     ]
   },
   "scripts": {
