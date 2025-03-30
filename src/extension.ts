@@ -97,6 +97,37 @@ export function activate(context: vscode.ExtensionContext) {
             if (position.line === 0 && position.character === 0) return;
         }
 
+        // Handle line boundary crossings
+        // When moving left from beginning of line, go to end of previous line
+        if (!moveRight && position.character === 0 && position.line > 0) {
+            const prevLine = document.lineAt(position.line - 1);
+            const newPosition = new vscode.Position(position.line - 1, prevLine.text.length);
+            
+            if (select) {
+                const anchor = editor.selection.anchor;
+                editor.selection = new vscode.Selection(anchor, newPosition);
+            } else {
+                editor.selection = new vscode.Selection(newPosition, newPosition);
+            }
+            return;
+        }
+        
+        // When moving right from end of line, go to beginning of next line
+        if (moveRight) {
+            const currentLine = document.lineAt(position.line);
+            if (position.character === currentLine.text.length && position.line < document.lineCount - 1) {
+                const newPosition = new vscode.Position(position.line + 1, 0);
+                
+                if (select) {
+                    const anchor = editor.selection.anchor;
+                    editor.selection = new vscode.Selection(anchor, newPosition);
+                } else {
+                    editor.selection = new vscode.Selection(newPosition, newPosition);
+                }
+                return;
+            }
+        }
+
         // Position to check (current for right, previous for left)
         const checkPosition = moveRight ? position : getAdjacentPosition(document, position, false);
         if (!checkPosition) return;
