@@ -1,71 +1,63 @@
-# wordmoveij README
+# WordMoveIJ - JetBrains Style Word Movement in VS Code
 
-This is the README for your extension "wordmoveij". After writing up a brief description, we recommend including the following sections.
+This extension modifies VS Code's word movement behavior to match JetBrains IDEs.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+WordMoveIJ changes how cursor movement works when using word navigation commands (Ctrl+Left, Ctrl+Right, Ctrl+Shift+Left, Ctrl+Shift+Right). In standard VS Code, word separators are often skipped over when navigating by word. This extension makes VS Code treat individual word separators as single-character "words" - matching the behavior found in JetBrains IDEs.
 
-For example if there is an image subfolder under your extension project workspace:
+### Key Differences
 
-\!\[feature X\]\(images/feature-x.png\)
+- When you encounter a word separator (like punctuation), the cursor will stop at each individual character
+- Multiple consecutive separators are navigated one at a time, rather than being skipped
+- This makes editing code more precise when dealing with punctuation and special characters
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## How to Use
+
+The extension provides four commands that replicate VS Code's word movement commands but with JetBrains-style behavior:
+
+- `wordmoveij.cursorWordStartLeft` (replaces `cursorWordStartLeft`)
+- `wordmoveij.cursorWordEndRight` (replaces `cursorWordEndRight`)
+- `wordmoveij.cursorWordStartLeftSelect` (replaces `cursorWordStartLeftSelect`)
+- `wordmoveij.cursorWordEndRightSelect` (replaces `cursorWordEndRightSelect`)
+
+By default, these commands are not bound to keyboard shortcuts. To use them, you'll need to add custom keybindings to your `keybindings.json` file:
+
+```json
+[
+    {
+        "key": "ctrl+left",
+        "command": "wordmoveij.cursorWordStartLeft",
+        "when": "textInputFocus && !accessibilityModeEnabled"
+    },
+    {
+        "key": "ctrl+right",
+        "command": "wordmoveij.cursorWordEndRight",
+        "when": "textInputFocus && !accessibilityModeEnabled"
+    },
+    {
+        "key": "ctrl+shift+left",
+        "command": "wordmoveij.cursorWordStartLeftSelect",
+        "when": "textInputFocus && !accessibilityModeEnabled"
+    },
+    {
+        "key": "ctrl+shift+right",
+        "command": "wordmoveij.cursorWordEndRightSelect",
+        "when": "textInputFocus && !accessibilityModeEnabled"
+    }
+]
+```
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+This extension uses VS Code's built-in word separator configuration. You can customize which characters are considered word separators by modifying the `editor.wordSeparators` setting in your preferences.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Please report any issues on the GitHub repository.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.1
 
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Initial release of WordMoveIJ with support for basic JetBrains-style word navigation.

@@ -1,7 +1,7 @@
 {
   "name": "wordmoveij",
   "displayName": "WordMoveIJ",
-  "description": "",
+  "description": "Word movement behavior matching JetBrains IDEs",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.98.0"
@@ -14,8 +14,20 @@
   "contributes": {
     "commands": [
       {
-        "command": "wordmoveij.helloWorld",
-        "title": "Hello World"
+        "command": "wordmoveij.cursorWordStartLeft",
+        "title": "WordMoveIJ: Move Cursor Word Start Left"
+      },
+      {
+        "command": "wordmoveij.cursorWordEndRight",
+        "title": "WordMoveIJ: Move Cursor Word End Right"
+      },
+      {
+        "command": "wordmoveij.cursorWordStartLeftSelect",
+        "title": "WordMoveIJ: Select Word Start Left"
+      },
+      {
+        "command": "wordmoveij.cursorWordEndRightSelect",
+        "title": "WordMoveIJ: Select Word End Right"
       }
     ]
   },
