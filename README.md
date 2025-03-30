@@ -41,12 +41,7 @@ I made this extension for myself, so I didn't bother publishing it.
 
 ### On a new PC
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/YOUR-USERNAME/wordmoveij.git
-   cd wordmoveij
-   ```
-
+1. Clone this repository.
 2. Install dependencies:
    ```bash
    npm install
