@@ -10,18 +10,15 @@ WordMoveIJ changes how cursor movement works when using word navigation commands
 
 - When you encounter a word separator (like punctuation), the cursor will stop at each individual character
 - Multiple consecutive separators are navigated one at a time, rather than being skipped
-- This makes editing code more precise when dealing with punctuation and special characters
 
 ## How to Use
 
-The extension provides four commands that replicate VS Code's word movement commands but with JetBrains-style behavior:
+The extension provides four commands:
 
 - `wordmoveij.cursorWordStartLeft` (replaces `cursorWordStartLeft`)
 - `wordmoveij.cursorWordEndRight` (replaces `cursorWordEndRight`)
 - `wordmoveij.cursorWordStartLeftSelect` (replaces `cursorWordStartLeftSelect`)
 - `wordmoveij.cursorWordEndRightSelect` (replaces `cursorWordEndRightSelect`)
-
-By default, these commands are not bound to keyboard shortcuts. To use them, you'll need to add custom keybindings to your `keybindings.json` file:
 
 ```json
 [
